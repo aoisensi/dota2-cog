@@ -1,0 +1,8 @@
+[psql]
+  dbname = "dota2-auto-role-dev"
+  host   = "localhost"
+  port   = 5432
+  user   = "postgres"
+  pass   = ""
+  sslmode= "disable"
+  blacklist = ["schema_migrations"]

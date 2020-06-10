@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dota2 Cog</title>
+</head>
+<body>
+  <h1>Dota2 Cog</h1>
+  <p>Discordの役職に自動でDota2のランク(メダル)を割り当てるbotです</p>
+  <p>1時間に1回、自動でOpenDotaから情報を取ってきて役職を割り当てます</p>
+  <hr>
+  <h3>使い方</h3>
+  <h4>サーバーアドミン</h4>
+  <p><a href="/add-bot" target="_blank">ここ</a>からサーバーにbotを追加してください</p>
+  <h4>サーバーメンバー</h4>
+  <p>Dota2 Cog ボットにDMで <code>/dota2-cog register</code> コマンドを送って</p>
+  <p>表示されたリンクをクリックし、Steamとの連携を有効にしてください</p>
+  <hr>
+  <h3>コマンドリスト</h3>
+  <h5>/dota2-cog register</h5>
+  <p>SteamとDiscordのIDを連携させます (DMコマンドのみ)</p>
+  <h5>/dota2-cog force-fetch</h5>
+  <p>現在のサーバーの全ユーザーのランクを取得します (乱用禁止!) (サーバーコマンドのみ)</p>
+  <hr>
+  <h3>その他</h3>
+  <p>本当はDiscordのプロフィールからSteamIDを取得したかったがAPIがサポートしてないのでログインさせるという形になった…</p>
+  <p>1000人以上いるサーバーでは最初の1000人しかデータを取れない 後々何とかする</p>
+  <p>サーバーにいる人全員に連携を促すDMを送るコマンド作りたいがスパム扱いされそう…</p>
+</body>
+</html>

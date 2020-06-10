@@ -1,0 +1,8 @@
+CREATE TABLE roles(
+  id BIGINT PRIMARY KEY,
+  guild_id BIGINT NOT NULL
+    REFERENCES guilds(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  rank INT NOT NULL,
+  UNIQUE(guild_id, rank)
+);
