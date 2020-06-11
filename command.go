@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aoisensi/dota2-auto-role/models"
+	"github.com/aoisensi/dota2-cog/models"
 	"github.com/bwmarrin/discordgo"
 )
 

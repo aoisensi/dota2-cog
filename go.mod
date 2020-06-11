@@ -1,4 +1,4 @@
-module github.com/aoisensi/dota2-auto-role
+module github.com/aoisensi/dota2-cog
 
 go 1.14
 

@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/aoisensi/dota2-auto-role/models"
+	"github.com/aoisensi/dota2-cog/models"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
