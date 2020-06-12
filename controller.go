@@ -76,6 +76,9 @@ func watchGuild(s *discordgo.Session, g *models.Guild) {
 		return
 	}
 	for _, member := range members {
+		if member.User.Bot {
+			continue
+		}
 		time.Sleep(time.Second * 5)
 		id, _ := strconv.ParseInt(member.User.ID, 10, 63)
 		user, err := models.FindUser(context.Background(), db, id)
