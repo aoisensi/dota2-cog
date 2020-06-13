@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -14,6 +15,9 @@ func fetchRank(steamID int64) (int, error) {
 		return 0, err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return 0, errors.New(resp.Status)
+	}
 	var result struct {
 		RankTier int `json:"rank_tier"`
 	}
