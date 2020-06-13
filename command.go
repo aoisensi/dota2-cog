@@ -25,9 +25,6 @@ func onMessageCreate(s *discordgo.Session, e *discordgo.MessageCreate) {
 }
 
 func commandRegister(s *discordgo.Session, e *discordgo.MessageCreate) {
-	if e.GuildID != "" {
-		return
-	}
 	id, _ := strconv.ParseInt(e.Author.ID, 10, 63)
 	nonce := makeConnectNonce(id)
 
