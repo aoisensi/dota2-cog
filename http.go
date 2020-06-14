@@ -52,7 +52,7 @@ func handleConnect(c *gin.Context) {
 	nonce := c.Query("nonce")
 	id := findNonce(nonce)
 	if id == 0 {
-		c.String(http.StatusBadRequest, "")
+		c.String(http.StatusBadRequest, "Nonce is wrong or used or expired.\nPlease try again from the command input.")
 		return
 	}
 	session := sessions.Default(c)
