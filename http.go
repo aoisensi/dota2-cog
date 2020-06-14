@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 
+	"github.com/aoisensi/dota2-cog/assets"
 	"github.com/aoisensi/dota2-cog/models"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -31,7 +31,7 @@ func httpServer() {
 }
 
 func handleIndex(c *gin.Context) {
-	f, err := os.Open("./views/index.html")
+	f, err := assets.Root.Open("views/index.html")
 	if err != nil {
 		panic(err)
 	}
