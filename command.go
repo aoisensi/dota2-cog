@@ -71,8 +71,14 @@ func commandForceFetch(s *discordgo.Session, e *discordgo.MessageCreate) {
 		return
 	}
 	s.ChannelMessageSend(e.ChannelID, "Force fetching...")
-	defer s.ChannelMessageSend(e.ChannelID, "Done!! Maybe...")
-	watchGuild(s, guild)
+	result, err := watchGuild(s, guild)
+	if err != nil {
+		log.Println(err)
+		s.ChannelMessageSend(e.ChannelID, "Failed! Sorry...")
+		return
+	}
+	s.ChannelMessageSend(e.ChannelID, fmt.Sprintf("Done!! Success: %v  Error: %v", result.Success, result.Error))
+
 }
 
 func commandDebugDeleteRoles(s *discordgo.Session, e *discordgo.MessageCreate) {

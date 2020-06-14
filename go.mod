@@ -14,13 +14,13 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.7.0
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/shogo82148/assets-life v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.0
 	github.com/volatiletech/inflect v0.0.1 // indirect
 	github.com/volatiletech/null v8.0.0+incompatible // indirect
 	github.com/volatiletech/sqlboiler v3.7.1+incompatible
 	github.com/yohcop/openid-go v1.0.0
+	go.uber.org/multierr v1.5.0
 	golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9 // indirect
 	golang.org/x/sys v0.0.0-20200610111108-226ff32320da // indirect
 )

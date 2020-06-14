@@ -10,6 +10,7 @@ import (
 	"github.com/aoisensi/dota2-cog/models"
 	"github.com/bwmarrin/discordgo"
 	"github.com/volatiletech/sqlboiler/boil"
+	"go.uber.org/multierr"
 )
 
 func createGuild(s *discordgo.Session, g *discordgo.Guild) {
@@ -63,53 +64,70 @@ func watchAll(s *discordgo.Session) {
 	}
 }
 
-func watchGuild(s *discordgo.Session, g *models.Guild) {
+func watchGuild(s *discordgo.Session, g *models.Guild) (*watchGuildResult, error) {
 	guildID := strconv.FormatInt(g.ID, 10)
 	members, err := s.GuildMembers(guildID, "", 1000)
 	if err != nil {
 		log.Println(err)
-		return
+		return nil, err
 	}
 	roles, err := g.Roles().All(context.Background(), db)
 	if err != nil {
 		log.Println(err)
-		return
+		return nil, err
 	}
+	result := watchGuildResult{}
 	for _, member := range members {
 		if member.User.Bot {
 			continue
 		}
 		time.Sleep(time.Second)
-		id, _ := strconv.ParseInt(member.User.ID, 10, 63)
-		user, err := models.FindUser(context.Background(), db, id)
-		if err != nil {
-			if err != sql.ErrNoRows {
-				log.Println(err)
+		err := watchMember(s, g, member, roles)
+		if err == sql.ErrNoRows {
+			result.NoRegister++
+		} else if err != nil {
+			result.Error++
+		} else {
+			result.Success++
+		}
+	}
+	return &result, nil
+}
+
+func watchMember(s *discordgo.Session, g *models.Guild, member *discordgo.Member, roles models.RoleSlice) error {
+	id, _ := strconv.ParseInt(member.User.ID, 10, 63)
+	user, err := models.FindUser(context.Background(), db, id)
+	if err != nil {
+		return err
+	}
+	rank, err := fetchRank(user.SteamID)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	medal := rank / 10
+
+	guildID := strconv.FormatInt(g.ID, 10)
+	var errs error
+	for _, r := range roles {
+		id := strconv.FormatInt(r.ID, 10)
+		if containsString(member.Roles, id) {
+			if r.Rank != medal {
+				if err := s.GuildMemberRoleRemove(guildID, member.User.ID, id); err != nil {
+					log.Println(err)
+					multierr.Append(errs, err)
+				}
 			}
-			continue
-		}
-		newRank, err := fetchRank(user.SteamID)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		// remove all cog roles
-		for _, roleID := range member.Roles {
-			for _, r := range roles {
-				if roleID == strconv.FormatInt(r.ID, 10) {
-					s.GuildMemberRoleRemove(guildID, member.User.ID, roleID)
-					break
+		} else {
+			if r.Rank == medal {
+				if err := s.GuildMemberRoleAdd(guildID, member.User.ID, id); err != nil {
+					log.Println(err)
+					multierr.Append(errs, err)
 				}
 			}
 		}
-		medal := newRank / 10
-		for _, role := range roles {
-			if role.Rank == medal {
-				s.GuildMemberRoleAdd(guildID, member.User.ID, strconv.FormatInt(role.ID, 10))
-				break
-			}
-		}
 	}
+	return errs
 }
 
 func onGuildCreate(s *discordgo.Session, e *discordgo.GuildCreate) {
@@ -128,4 +146,8 @@ func onGuildDelete(s *discordgo.Session, e *discordgo.GuildDelete) {
 	if _, err := guild.Delete(context.Background(), db); err != nil {
 		log.Println(err)
 	}
+}
+
+type watchGuildResult struct {
+	Success, NoRegister, Error int
 }
