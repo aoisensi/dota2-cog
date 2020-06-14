@@ -59,7 +59,6 @@ type Env struct {
 	DiscordClientID string `required:"true" split_words:"true"`
 	DiscordBotToken string `required:"true" split_words:"true"`
 	DatabaseURL     string `required:"true" split_words:"true"`
-	SteamAPIKey     string `required:"true" split_words:"true"`
 	Host            string `required:"true" split_words:"true"`
 	SessionKey      string `require:"true" split_words:"true"`
 }
