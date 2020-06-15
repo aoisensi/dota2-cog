@@ -4,6 +4,7 @@
 
 - Add progress bar to force-fetch command
 - Add error to try to fetch again while fetching
+- Add fix-roles
 
 ## 0.1.3
 

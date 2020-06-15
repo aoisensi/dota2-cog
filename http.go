@@ -31,7 +31,7 @@ func httpServer() {
 }
 
 func handleIndex(c *gin.Context) {
-	f, err := assets.Root.Open("views/index.html")
+	f, err := assets.Root.Open("index.html")
 	if err != nil {
 		panic(err)
 	}

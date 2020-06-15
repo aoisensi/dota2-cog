@@ -15,44 +15,59 @@ import (
 
 var fetching = make(map[string]struct{}, 16)
 
-func createGuild(s *discordgo.Session, g *discordgo.Guild) {
+func createGuild(s *discordgo.Session, g *discordgo.Guild) error {
 	id, _ := strconv.ParseInt(g.ID, 10, 63)
 	guild := models.Guild{
 		ID: id,
 	}
 	if err := guild.Insert(context.Background(), db, boil.Infer()); err != nil {
 		log.Println(err)
+		return err
 	}
-	roles := createRoles(s, g)
+	roles, err := createRoles(s, g)
+	if err != nil {
+		return err
+	}
 	for _, role := range roles {
 		role.GuildID = id
 		if err := role.Insert(context.Background(), db, boil.Infer()); err != nil {
 			log.Println(err)
+			return err
 		}
 	}
+	return nil
 }
 
-func createRoles(s *discordgo.Session, g *discordgo.Guild) []*models.Role {
+func createRoles(s *discordgo.Session, g *discordgo.Guild) ([]*models.Role, error) {
 	roles := make([]*models.Role, len(rankNames))
-	for i, rank := range rankNames {
-		name := "Dota2 " + rank
-		role, err := s.GuildRoleCreate(g.ID)
+	var errs error
+	for i := range rankNames {
+		var err error
+		roles[i], err = createRole(s, g.ID, i)
 		if err != nil {
-			log.Println(err)
-			continue
-		}
-		role, err = s.GuildRoleEdit(g.ID, role.ID, name, role.Color, role.Hoist, role.Permissions, false)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		id, _ := strconv.ParseInt(role.ID, 10, 63)
-		roles[i] = &models.Role{
-			ID:   id,
-			Rank: i,
+			errs = multierr.Append(errs, err)
 		}
 	}
-	return roles
+	return roles, errs
+}
+
+func createRole(s *discordgo.Session, gid string, rank int) (*models.Role, error) {
+	name := "Dota2 " + rankNames[rank]
+	role, err := s.GuildRoleCreate(gid)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	role, err = s.GuildRoleEdit(gid, role.ID, name, role.Color, role.Hoist, role.Permissions, false)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	id, _ := strconv.ParseInt(role.ID, 10, 63)
+	return &models.Role{
+		ID:   id,
+		Rank: rank,
+	}, nil
 }
 
 func watchAll(s *discordgo.Session) {
@@ -142,7 +157,9 @@ func onGuildCreate(s *discordgo.Session, e *discordgo.GuildCreate) {
 	id, _ := strconv.ParseInt(e.ID, 10, 63)
 	_, err := models.FindGuild(context.Background(), db, id)
 	if err == sql.ErrNoRows {
-		createGuild(s, e.Guild)
+		if err := createGuild(s, e.Guild); err != nil {
+			log.Println(err)
+		}
 	} else if err != nil {
 		log.Print(err)
 	}

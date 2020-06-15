@@ -9,6 +9,8 @@ import (
 
 	"github.com/aoisensi/dota2-cog/models"
 	"github.com/bwmarrin/discordgo"
+	"github.com/volatiletech/sqlboiler/boil"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
 func onMessageCreate(s *discordgo.Session, e *discordgo.MessageCreate) {
@@ -21,6 +23,8 @@ func onMessageCreate(s *discordgo.Session, e *discordgo.MessageCreate) {
 		commandRegister(s, e)
 	case "/dota2-cog force-fetch":
 		commandForceFetch(s, e)
+	case "/dota2-cog fix-roles":
+		commandFixRoles(s, e)
 	}
 }
 
@@ -37,27 +41,9 @@ func commandRegister(s *discordgo.Session, e *discordgo.MessageCreate) {
 }
 
 func commandForceFetch(s *discordgo.Session, e *discordgo.MessageCreate) {
-	if e.GuildID == "" {
-		return
-	}
-	dGuild, err := s.Guild(e.GuildID)
+	admin, err := isAdmin(s, e)
 	if err != nil {
-		log.Println(err)
 		return
-	}
-	admin := false
-	for _, roleID := range e.Member.Roles {
-		for _, role := range dGuild.Roles {
-			if roleID == role.ID {
-				if (role.Permissions & 0x8) > 0 {
-					admin = true
-					break
-				}
-			}
-		}
-		if admin {
-			break
-		}
 	}
 	if !admin {
 		s.ChannelMessageSend(e.ChannelID, "This command is only available to the administrator.")
@@ -109,8 +95,50 @@ func commandForceFetch(s *discordgo.Session, e *discordgo.MessageCreate) {
 
 }
 
+func commandFixRoles(s *discordgo.Session, e *discordgo.MessageCreate) {
+	admin, err := isAdmin(s, e)
+	if err != nil {
+		return
+	}
+	if !admin {
+		s.ChannelMessageSend(e.ChannelID, "This command is only available to the administrator.")
+		return
+	}
+	s.ChannelMessageSend(e.ChannelID, "Auto fixing...")
+	roles, err := models.Roles(qm.Where("guild_id = ?", e.GuildID)).All(context.Background(), db)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	for _, role := range roles {
+		id := strconv.FormatInt(role.ID, 10)
+		_, err := s.State.Role(e.GuildID, id)
+		if err != nil && err != discordgo.ErrStateNotFound {
+			log.Println(err)
+			return
+		}
+		if err == nil {
+			continue
+		}
+		msg := fmt.Sprintf("%v role is missing. Recreating...", rankNames[role.Rank])
+		s.ChannelMessageSend(e.ChannelID, msg)
+		if _, err := role.Delete(context.Background(), db); err != nil {
+			log.Println(err)
+			continue
+		}
+		r, err := createRole(s, e.GuildID, role.Rank)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		r.GuildID, _ = strconv.ParseInt(e.GuildID, 10, 63)
+		r.Insert(context.Background(), db, boil.Infer())
+	}
+	s.ChannelMessageSend(e.ChannelID, "Auto fix done!!")
+}
+
 func commandDebugDeleteRoles(s *discordgo.Session, e *discordgo.MessageCreate) {
-	if e.Member.User.ID != "135617831864762368" {
+	if e.Member.User.ID != aoisensi {
 		return
 	}
 	guild, err := s.Guild(e.GuildID)
@@ -129,7 +157,7 @@ func commandDebugDeleteRoles(s *discordgo.Session, e *discordgo.MessageCreate) {
 }
 
 func commandDebugHi(s *discordgo.Session, e *discordgo.MessageCreate) {
-	if e.Member.User.ID != "135617831864762368" {
+	if e.Member.User.ID != aoisensi {
 		return
 	}
 	s.ChannelMessageSend(e.ChannelID, "sup")

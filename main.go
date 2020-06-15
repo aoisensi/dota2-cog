@@ -60,5 +60,5 @@ type Env struct {
 	DiscordBotToken string `required:"true" split_words:"true"`
 	DatabaseURL     string `required:"true" split_words:"true"`
 	Host            string `required:"true" split_words:"true"`
-	SessionKey      string `require:"true" split_words:"true"`
+	SessionKey      string `required:"true" split_words:"true"`
 }
