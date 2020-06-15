@@ -78,9 +78,13 @@ func commandForceFetch(s *discordgo.Session, e *discordgo.MessageCreate) {
 	pc := make(chan progress)
 	defer close(pc)
 	go func() {
+		xo := -1
 		for {
 			p := <-pc
 			x := p.Done * 10 / p.All
+			if x == xo {
+				continue
+			}
 			msg := fmt.Sprintf(
 				"%v%v %v%%",
 				strings.Repeat("▰", x),
@@ -91,6 +95,7 @@ func commandForceFetch(s *discordgo.Session, e *discordgo.MessageCreate) {
 			if p.Done == p.All {
 				break
 			}
+			xo = x
 		}
 	}()
 	result, err := watchGuild(s, guild, pc)
