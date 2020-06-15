@@ -60,11 +60,11 @@ func watchAll(s *discordgo.Session) {
 		return
 	}
 	for _, guild := range guilds {
-		watchGuild(s, guild)
+		watchGuild(s, guild, nil)
 	}
 }
 
-func watchGuild(s *discordgo.Session, g *models.Guild) (*watchGuildResult, error) {
+func watchGuild(s *discordgo.Session, g *models.Guild, p chan progress) (*watchGuildResult, error) {
 	guildID := strconv.FormatInt(g.ID, 10)
 	members, err := s.GuildMembers(guildID, "", 1000)
 	if err != nil {
@@ -76,13 +76,16 @@ func watchGuild(s *discordgo.Session, g *models.Guild) (*watchGuildResult, error
 		log.Println(err)
 		return nil, err
 	}
+	pa := len(members)
 	result := watchGuildResult{}
-	for _, member := range members {
+	for i, member := range members {
 		if member.User.Bot {
 			continue
 		}
-		time.Sleep(time.Second)
 		err := watchMember(s, g, member, roles)
+		if p != nil {
+			p <- progress{Done: i + 1, All: pa}
+		}
 		if err == sql.ErrNoRows {
 			result.NoRegister++
 		} else if err != nil {
@@ -90,6 +93,7 @@ func watchGuild(s *discordgo.Session, g *models.Guild) (*watchGuildResult, error
 		} else {
 			result.Success++
 		}
+		time.Sleep(time.Second)
 	}
 	return &result, nil
 }
@@ -150,4 +154,8 @@ func onGuildDelete(s *discordgo.Session, e *discordgo.GuildDelete) {
 
 type watchGuildResult struct {
 	Success, NoRegister, Error int
+}
+
+type progress struct {
+	Done, All int
 }

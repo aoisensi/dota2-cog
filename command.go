@@ -71,12 +71,32 @@ func commandForceFetch(s *discordgo.Session, e *discordgo.MessageCreate) {
 		return
 	}
 	s.ChannelMessageSend(e.ChannelID, "Force fetching...")
-	result, err := watchGuild(s, guild)
+	pid, _ := s.ChannelMessageSend(e.ChannelID, "▱▱▱▱▱▱▱▱▱▱ 0%")
+	pc := make(chan progress)
+	defer close(pc)
+	go func() {
+		for {
+			p := <-pc
+			x := p.Done * 10 / p.All
+			msg := fmt.Sprintf(
+				"%v%v %v%%",
+				strings.Repeat("▰", x),
+				strings.Repeat("▱", 10-x),
+				p.Done*100/p.All,
+			)
+			s.ChannelMessageEdit(e.ChannelID, pid.ID, msg)
+			if p.Done == p.All {
+				break
+			}
+		}
+	}()
+	result, err := watchGuild(s, guild, pc)
 	if err != nil {
 		log.Println(err)
 		s.ChannelMessageSend(e.ChannelID, "Failed! Sorry...")
 		return
 	}
+	pc <- progress{Done: 1, All: 1} //force close
 	s.ChannelMessageSend(e.ChannelID, fmt.Sprintf("Done!! Success: %v  Error: %v", result.Success, result.Error))
 
 }
