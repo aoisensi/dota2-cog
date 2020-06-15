@@ -1,3 +1,10 @@
+## 0.1.4
+
+2020-06-15
+
+- Add progress bar to force-fetch command
+- Add error to try to fetch again while fetching
+
 ## 0.1.3
 
 2020-06-14

@@ -13,6 +13,8 @@ import (
 	"go.uber.org/multierr"
 )
 
+var fetching = make(map[string]struct{}, 16)
+
 func createGuild(s *discordgo.Session, g *discordgo.Guild) {
 	id, _ := strconv.ParseInt(g.ID, 10, 63)
 	guild := models.Guild{
@@ -66,6 +68,8 @@ func watchAll(s *discordgo.Session) {
 
 func watchGuild(s *discordgo.Session, g *models.Guild, p chan progress) (*watchGuildResult, error) {
 	guildID := strconv.FormatInt(g.ID, 10)
+	fetching[guildID] = struct{}{}
+	defer delete(fetching, guildID)
 	members, err := s.GuildMembers(guildID, "", 1000)
 	if err != nil {
 		log.Println(err)

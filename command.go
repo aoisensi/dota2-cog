@@ -63,7 +63,10 @@ func commandForceFetch(s *discordgo.Session, e *discordgo.MessageCreate) {
 		s.ChannelMessageSend(e.ChannelID, "This command is only available to the administrator.")
 		return
 	}
-
+	if _, ok := fetching[e.GuildID]; ok {
+		s.ChannelMessageSend(e.ChannelID, "I'm fetching. Don't spam it.")
+		return
+	}
 	id, _ := strconv.ParseInt(e.GuildID, 10, 63)
 	guild, err := models.FindGuild(context.Background(), db, id)
 	if err != nil {
