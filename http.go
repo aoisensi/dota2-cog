@@ -24,6 +24,7 @@ func httpServer() {
 	store := cookie.NewStore([]byte(env.SessionKey))
 	r.Use(sessions.Sessions("session", store))
 	r.GET("/", handleIndex)
+	r.GET("/index.md", handleIndexMD)
 	r.GET("/add-bot", handleAddBot)
 	r.GET("/connect", handleConnect)
 	r.GET("/connect-ok", handleConnectOK)
@@ -32,6 +33,16 @@ func httpServer() {
 
 func handleIndex(c *gin.Context) {
 	f, err := assets.Root.Open("index.html")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	data, _ := ioutil.ReadAll(f)
+	c.Writer.Write(data)
+}
+
+func handleIndexMD(c *gin.Context) {
+	f, err := assets.Root.Open("index.md")
 	if err != nil {
 		panic(err)
 	}

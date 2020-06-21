@@ -32,6 +32,10 @@ func onMessageCreate(s *discordgo.Session, e *discordgo.MessageCreate) {
 }
 
 func commandRegister(s *discordgo.Session, e *discordgo.MessageCreate) {
+	if e.GuildID == "" {
+		s.ChannelMessageSend(e.ChannelID, "This command is only available in Direct Message.")
+		return
+	}
 	id, _ := strconv.ParseInt(e.Author.ID, 10, 63)
 	nonce := makeConnectNonce(id)
 

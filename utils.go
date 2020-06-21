@@ -26,6 +26,9 @@ func isAdmin(s *discordgo.Session, e *discordgo.MessageCreate) (bool, error) {
 		log.Println(err)
 		return false, err
 	}
+	if dGuild.OwnerID == e.Author.ID {
+		return true, err
+	}
 	for _, roleID := range e.Member.Roles {
 		for _, role := range dGuild.Roles {
 			if roleID == role.ID {
