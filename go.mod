@@ -4,13 +4,12 @@ go 1.14
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.4.1 // indirect
-	github.com/bwmarrin/discordgo v0.20.3
+	github.com/bwmarrin/discordgo v0.21.1
 	github.com/friendsofgo/errors v0.9.2
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.6.3
 	github.com/gofrs/uuid v3.3.0+incompatible // indirect
 	github.com/google/uuid v1.1.1
-	github.com/k0kubun/pp v3.0.1+incompatible // indirect
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.7.0
@@ -23,5 +22,5 @@ require (
 	github.com/yohcop/openid-go v1.0.0
 	go.uber.org/multierr v1.5.0
 	golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9 // indirect
-	golang.org/x/sys v0.0.0-20200610111108-226ff32320da // indirect
+	golang.org/x/sys v0.0.0-20200620081246-981b61492c35 // indirect
 )
