@@ -494,14 +494,127 @@ func testGuildsInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testGuildToManyRoles(t *testing.T) {
+func testGuildOneToOneRegisterdRoleUsingRegisterdRole(t *testing.T) {
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var foreign RegisterdRole
+	var local Guild
+
+	seed := randomize.NewSeed()
+	if err := randomize.Struct(seed, &foreign, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
+	}
+	if err := randomize.Struct(seed, &local, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
+	}
+
+	if err := local.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	foreign.GuildID = local.ID
+	if err := foreign.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	check, err := local.RegisterdRole().One(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if check.GuildID != foreign.GuildID {
+		t.Errorf("want: %v, got %v", foreign.GuildID, check.GuildID)
+	}
+
+	slice := GuildSlice{&local}
+	if err = local.L.LoadRegisterdRole(ctx, tx, false, (*[]*Guild)(&slice), nil); err != nil {
+		t.Fatal(err)
+	}
+	if local.R.RegisterdRole == nil {
+		t.Error("struct should have been eager loaded")
+	}
+
+	local.R.RegisterdRole = nil
+	if err = local.L.LoadRegisterdRole(ctx, tx, true, &local, nil); err != nil {
+		t.Fatal(err)
+	}
+	if local.R.RegisterdRole == nil {
+		t.Error("struct should have been eager loaded")
+	}
+}
+
+func testGuildOneToOneSetOpRegisterdRoleUsingRegisterdRole(t *testing.T) {
+	var err error
+
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a Guild
+	var b, c RegisterdRole
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, guildDBTypes, false, strmangle.SetComplement(guildPrimaryKeyColumns, guildColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	if err = randomize.Struct(seed, &b, registerdRoleDBTypes, false, strmangle.SetComplement(registerdRolePrimaryKeyColumns, registerdRoleColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	if err = randomize.Struct(seed, &c, registerdRoleDBTypes, false, strmangle.SetComplement(registerdRolePrimaryKeyColumns, registerdRoleColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	for i, x := range []*RegisterdRole{&b, &c} {
+		err = a.SetRegisterdRole(ctx, tx, i != 0, x)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if a.R.RegisterdRole != x {
+			t.Error("relationship struct not set to correct value")
+		}
+		if x.R.Guild != &a {
+			t.Error("failed to append to foreign relationship struct")
+		}
+
+		if a.ID != x.GuildID {
+			t.Error("foreign key was wrong value", a.ID)
+		}
+
+		zero := reflect.Zero(reflect.TypeOf(x.GuildID))
+		reflect.Indirect(reflect.ValueOf(&x.GuildID)).Set(zero)
+
+		if err = x.Reload(ctx, tx); err != nil {
+			t.Fatal("failed to reload", err)
+		}
+
+		if a.ID != x.GuildID {
+			t.Error("foreign key was wrong value", a.ID, x.GuildID)
+		}
+
+		if _, err = x.Delete(ctx, tx); err != nil {
+			t.Fatal("failed to delete x", err)
+		}
+	}
+}
+
+func testGuildToManyRankRoles(t *testing.T) {
 	var err error
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
 	var a Guild
-	var b, c Role
+	var b, c RankRole
 
 	seed := randomize.NewSeed()
 	if err = randomize.Struct(seed, &a, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
@@ -512,10 +625,10 @@ func testGuildToManyRoles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err = randomize.Struct(seed, &b, roleDBTypes, false, roleColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &b, rankRoleDBTypes, false, rankRoleColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
-	if err = randomize.Struct(seed, &c, roleDBTypes, false, roleColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &c, rankRoleDBTypes, false, rankRoleColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
 
@@ -529,7 +642,7 @@ func testGuildToManyRoles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	check, err := a.Roles().All(ctx, tx)
+	check, err := a.RankRoles().All(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -552,18 +665,18 @@ func testGuildToManyRoles(t *testing.T) {
 	}
 
 	slice := GuildSlice{&a}
-	if err = a.L.LoadRoles(ctx, tx, false, (*[]*Guild)(&slice), nil); err != nil {
+	if err = a.L.LoadRankRoles(ctx, tx, false, (*[]*Guild)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.Roles); got != 2 {
+	if got := len(a.R.RankRoles); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
-	a.R.Roles = nil
-	if err = a.L.LoadRoles(ctx, tx, true, &a, nil); err != nil {
+	a.R.RankRoles = nil
+	if err = a.L.LoadRankRoles(ctx, tx, true, &a, nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.Roles); got != 2 {
+	if got := len(a.R.RankRoles); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
@@ -572,7 +685,7 @@ func testGuildToManyRoles(t *testing.T) {
 	}
 }
 
-func testGuildToManyAddOpRoles(t *testing.T) {
+func testGuildToManyAddOpRankRoles(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
@@ -580,15 +693,15 @@ func testGuildToManyAddOpRoles(t *testing.T) {
 	defer func() { _ = tx.Rollback() }()
 
 	var a Guild
-	var b, c, d, e Role
+	var b, c, d, e RankRole
 
 	seed := randomize.NewSeed()
 	if err = randomize.Struct(seed, &a, guildDBTypes, false, strmangle.SetComplement(guildPrimaryKeyColumns, guildColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	foreigners := []*Role{&b, &c, &d, &e}
+	foreigners := []*RankRole{&b, &c, &d, &e}
 	for _, x := range foreigners {
-		if err = randomize.Struct(seed, x, roleDBTypes, false, strmangle.SetComplement(rolePrimaryKeyColumns, roleColumnsWithoutDefault)...); err != nil {
+		if err = randomize.Struct(seed, x, rankRoleDBTypes, false, strmangle.SetComplement(rankRolePrimaryKeyColumns, rankRoleColumnsWithoutDefault)...); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -603,13 +716,13 @@ func testGuildToManyAddOpRoles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	foreignersSplitByInsertion := [][]*Role{
+	foreignersSplitByInsertion := [][]*RankRole{
 		{&b, &c},
 		{&d, &e},
 	}
 
 	for i, x := range foreignersSplitByInsertion {
-		err = a.AddRoles(ctx, tx, i != 0, x...)
+		err = a.AddRankRoles(ctx, tx, i != 0, x...)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -631,14 +744,14 @@ func testGuildToManyAddOpRoles(t *testing.T) {
 			t.Error("relationship was not added properly to the foreign slice")
 		}
 
-		if a.R.Roles[i*2] != first {
+		if a.R.RankRoles[i*2] != first {
 			t.Error("relationship struct slice not set to correct value")
 		}
-		if a.R.Roles[i*2+1] != second {
+		if a.R.RankRoles[i*2+1] != second {
 			t.Error("relationship struct slice not set to correct value")
 		}
 
-		count, err := a.Roles().Count(ctx, tx)
+		count, err := a.RankRoles().Count(ctx, tx)
 		if err != nil {
 			t.Fatal(err)
 		}

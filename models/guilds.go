@@ -61,14 +61,17 @@ var GuildWhere = struct {
 
 // GuildRels is where relationship names are stored.
 var GuildRels = struct {
-	Roles string
+	RegisterdRole string
+	RankRoles     string
 }{
-	Roles: "Roles",
+	RegisterdRole: "RegisterdRole",
+	RankRoles:     "RankRoles",
 }
 
 // guildR is where relationships are stored.
 type guildR struct {
-	Roles RoleSlice
+	RegisterdRole *RegisterdRole
+	RankRoles     RankRoleSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -361,30 +364,44 @@ func (q guildQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool
 	return count > 0, nil
 }
 
-// Roles retrieves all the role's Roles with an executor.
-func (o *Guild) Roles(mods ...qm.QueryMod) roleQuery {
+// RegisterdRole pointed to by the foreign key.
+func (o *Guild) RegisterdRole(mods ...qm.QueryMod) registerdRoleQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"guild_id\" = ?", o.ID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	query := RegisterdRoles(queryMods...)
+	queries.SetFrom(query.Query, "\"registerd_roles\"")
+
+	return query
+}
+
+// RankRoles retrieves all the rank_role's RankRoles with an executor.
+func (o *Guild) RankRoles(mods ...qm.QueryMod) rankRoleQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"roles\".\"guild_id\"=?", o.ID),
+		qm.Where("\"rank_roles\".\"guild_id\"=?", o.ID),
 	)
 
-	query := Roles(queryMods...)
-	queries.SetFrom(query.Query, "\"roles\"")
+	query := RankRoles(queryMods...)
+	queries.SetFrom(query.Query, "\"rank_roles\"")
 
 	if len(queries.GetSelect(query.Query)) == 0 {
-		queries.SetSelect(query.Query, []string{"\"roles\".*"})
+		queries.SetSelect(query.Query, []string{"\"rank_roles\".*"})
 	}
 
 	return query
 }
 
-// LoadRoles allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (guildL) LoadRoles(ctx context.Context, e boil.ContextExecutor, singular bool, maybeGuild interface{}, mods queries.Applicator) error {
+// LoadRegisterdRole allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-1 relationship.
+func (guildL) LoadRegisterdRole(ctx context.Context, e boil.ContextExecutor, singular bool, maybeGuild interface{}, mods queries.Applicator) error {
 	var slice []*Guild
 	var object *Guild
 
@@ -421,52 +438,55 @@ func (guildL) LoadRoles(ctx context.Context, e boil.ContextExecutor, singular bo
 		return nil
 	}
 
-	query := NewQuery(qm.From(`roles`), qm.WhereIn(`roles.guild_id in ?`, args...))
+	query := NewQuery(qm.From(`registerd_roles`), qm.WhereIn(`registerd_roles.guild_id in ?`, args...))
 	if mods != nil {
 		mods.Apply(query)
 	}
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load roles")
+		return errors.Wrap(err, "failed to eager load RegisterdRole")
 	}
 
-	var resultSlice []*Role
+	var resultSlice []*RegisterdRole
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice roles")
+		return errors.Wrap(err, "failed to bind eager loaded slice RegisterdRole")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on roles")
+		return errors.Wrap(err, "failed to close results of eager load for registerd_roles")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for roles")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for registerd_roles")
 	}
 
-	if len(roleAfterSelectHooks) != 0 {
+	if len(guildAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
 			}
 		}
 	}
-	if singular {
-		object.R.Roles = resultSlice
-		for _, foreign := range resultSlice {
-			if foreign.R == nil {
-				foreign.R = &roleR{}
-			}
-			foreign.R.Guild = object
-		}
+
+	if len(resultSlice) == 0 {
 		return nil
 	}
 
-	for _, foreign := range resultSlice {
-		for _, local := range slice {
+	if singular {
+		foreign := resultSlice[0]
+		object.R.RegisterdRole = foreign
+		if foreign.R == nil {
+			foreign.R = &registerdRoleR{}
+		}
+		foreign.R.Guild = object
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
 			if local.ID == foreign.GuildID {
-				local.R.Roles = append(local.R.Roles, foreign)
+				local.R.RegisterdRole = foreign
 				if foreign.R == nil {
-					foreign.R = &roleR{}
+					foreign.R = &registerdRoleR{}
 				}
 				foreign.R.Guild = local
 				break
@@ -477,11 +497,157 @@ func (guildL) LoadRoles(ctx context.Context, e boil.ContextExecutor, singular bo
 	return nil
 }
 
-// AddRoles adds the given related objects to the existing relationships
+// LoadRankRoles allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (guildL) LoadRankRoles(ctx context.Context, e boil.ContextExecutor, singular bool, maybeGuild interface{}, mods queries.Applicator) error {
+	var slice []*Guild
+	var object *Guild
+
+	if singular {
+		object = maybeGuild.(*Guild)
+	} else {
+		slice = *maybeGuild.(*[]*Guild)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &guildR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &guildR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`rank_roles`), qm.WhereIn(`rank_roles.guild_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load rank_roles")
+	}
+
+	var resultSlice []*RankRole
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice rank_roles")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on rank_roles")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for rank_roles")
+	}
+
+	if len(rankRoleAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.RankRoles = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &rankRoleR{}
+			}
+			foreign.R.Guild = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.GuildID {
+				local.R.RankRoles = append(local.R.RankRoles, foreign)
+				if foreign.R == nil {
+					foreign.R = &rankRoleR{}
+				}
+				foreign.R.Guild = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// SetRegisterdRole of the guild to the related item.
+// Sets o.R.RegisterdRole to related.
+// Adds o to related.R.Guild.
+func (o *Guild) SetRegisterdRole(ctx context.Context, exec boil.ContextExecutor, insert bool, related *RegisterdRole) error {
+	var err error
+
+	if insert {
+		related.GuildID = o.ID
+
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	} else {
+		updateQuery := fmt.Sprintf(
+			"UPDATE \"registerd_roles\" SET %s WHERE %s",
+			strmangle.SetParamNames("\"", "\"", 1, []string{"guild_id"}),
+			strmangle.WhereClause("\"", "\"", 2, registerdRolePrimaryKeyColumns),
+		)
+		values := []interface{}{o.ID, related.ID}
+
+		if boil.IsDebug(ctx) {
+			writer := boil.DebugWriterFrom(ctx)
+			fmt.Fprintln(writer, updateQuery)
+			fmt.Fprintln(writer, values)
+		}
+		if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+			return errors.Wrap(err, "failed to update foreign table")
+		}
+
+		related.GuildID = o.ID
+
+	}
+
+	if o.R == nil {
+		o.R = &guildR{
+			RegisterdRole: related,
+		}
+	} else {
+		o.R.RegisterdRole = related
+	}
+
+	if related.R == nil {
+		related.R = &registerdRoleR{
+			Guild: o,
+		}
+	} else {
+		related.R.Guild = o
+	}
+	return nil
+}
+
+// AddRankRoles adds the given related objects to the existing relationships
 // of the guild, optionally inserting them as new records.
-// Appends related to o.R.Roles.
+// Appends related to o.R.RankRoles.
 // Sets related.R.Guild appropriately.
-func (o *Guild) AddRoles(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Role) error {
+func (o *Guild) AddRankRoles(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*RankRole) error {
 	var err error
 	for _, rel := range related {
 		if insert {
@@ -491,9 +657,9 @@ func (o *Guild) AddRoles(ctx context.Context, exec boil.ContextExecutor, insert 
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
-				"UPDATE \"roles\" SET %s WHERE %s",
+				"UPDATE \"rank_roles\" SET %s WHERE %s",
 				strmangle.SetParamNames("\"", "\"", 1, []string{"guild_id"}),
-				strmangle.WhereClause("\"", "\"", 2, rolePrimaryKeyColumns),
+				strmangle.WhereClause("\"", "\"", 2, rankRolePrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
 
@@ -512,15 +678,15 @@ func (o *Guild) AddRoles(ctx context.Context, exec boil.ContextExecutor, insert 
 
 	if o.R == nil {
 		o.R = &guildR{
-			Roles: related,
+			RankRoles: related,
 		}
 	} else {
-		o.R.Roles = append(o.R.Roles, related...)
+		o.R.RankRoles = append(o.R.RankRoles, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
-			rel.R = &roleR{
+			rel.R = &rankRoleR{
 				Guild: o,
 			}
 		} else {

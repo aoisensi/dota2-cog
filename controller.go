@@ -24,50 +24,70 @@ func createGuild(s *discordgo.Session, g *discordgo.Guild) error {
 		log.Println(err)
 		return err
 	}
-	roles, err := createRoles(s, g)
+	roles, err := createRankRoles(s, g.ID)
 	if err != nil {
 		return err
 	}
 	for _, role := range roles {
-		role.GuildID = id
 		if err := role.Insert(context.Background(), db, boil.Infer()); err != nil {
 			log.Println(err)
 			return err
 		}
 	}
+	role, err := createRegisterdRole(s, g.ID)
+	if err := role.Insert(context.Background(), db, boil.Infer()); err != nil {
+		log.Println(err)
+		return err
+	}
 	return nil
 }
 
-func createRoles(s *discordgo.Session, g *discordgo.Guild) ([]*models.Role, error) {
-	roles := make([]*models.Role, len(rankNames))
+func createRankRoles(s *discordgo.Session, guildID string) ([]*models.RankRole, error) {
+	roles := make([]*models.RankRole, len(rankNames))
+	gid, _ := strconv.ParseInt(guildID, 10, 63)
 	var errs error
 	for i := range rankNames {
 		var err error
-		roles[i], err = createRole(s, g.ID, i)
+		name := "Dota2 " + rankNames[i]
+		id, err := createRole(s, guildID, name)
 		if err != nil {
 			errs = multierr.Append(errs, err)
+		}
+		roles[i] = &models.RankRole{
+			ID:      id,
+			GuildID: gid,
+			Rank:    i,
 		}
 	}
 	return roles, errs
 }
 
-func createRole(s *discordgo.Session, gid string, rank int) (*models.Role, error) {
-	name := "Dota2 " + rankNames[rank]
+func createRegisterdRole(s *discordgo.Session, guildID string) (*models.RegisterdRole, error) {
+	name := "Dota2 Cog Registerd"
+	gid, _ := strconv.ParseInt(guildID, 10, 63)
+	id, err := createRole(s, guildID, name)
+	if err != nil {
+		return nil, err
+	}
+	return &models.RegisterdRole{
+		GuildID: gid,
+		ID:      id,
+	}, nil
+}
+
+func createRole(s *discordgo.Session, gid string, name string) (int64, error) {
 	role, err := s.GuildRoleCreate(gid)
 	if err != nil {
 		log.Println(err)
-		return nil, err
+		return 0, err
 	}
 	role, err = s.GuildRoleEdit(gid, role.ID, name, role.Color, role.Hoist, role.Permissions, false)
 	if err != nil {
 		log.Println(err)
-		return nil, err
+		return 0, err
 	}
 	id, _ := strconv.ParseInt(role.ID, 10, 63)
-	return &models.Role{
-		ID:   id,
-		Rank: rank,
-	}, nil
+	return id, nil
 }
 
 func watchAll(s *discordgo.Session) {
@@ -90,8 +110,13 @@ func watchGuild(s *discordgo.Session, g *models.Guild, p chan progress) (*watchG
 		log.Println(err)
 		return nil, err
 	}
-	roles, err := g.Roles().All(context.Background(), db)
+	roles, err := g.RankRoles().All(context.Background(), db)
 	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	registerdRole, rerr := g.RegisterdRole().One(context.Background(), db)
+	if rerr != nil && rerr != sql.ErrNoRows {
 		log.Println(err)
 		return nil, err
 	}
@@ -101,7 +126,7 @@ func watchGuild(s *discordgo.Session, g *models.Guild, p chan progress) (*watchG
 		if member.User.Bot {
 			continue
 		}
-		err := watchMember(s, g, member, roles)
+		err := watchMember(s, g, member, roles, registerdRole)
 		if p != nil {
 			p <- progress{Done: i + 1, All: pa}
 		}
@@ -117,11 +142,35 @@ func watchGuild(s *discordgo.Session, g *models.Guild, p chan progress) (*watchG
 	return &result, nil
 }
 
-func watchMember(s *discordgo.Session, g *models.Guild, member *discordgo.Member, roles models.RoleSlice) error {
+func watchMember(
+	s *discordgo.Session,
+	g *models.Guild,
+	member *discordgo.Member,
+	roles models.RankRoleSlice,
+	registerdRole *models.RegisterdRole,
+) error {
 	id, _ := strconv.ParseInt(member.User.ID, 10, 63)
+	guildID := strconv.FormatInt(g.ID, 10)
 	user, err := models.FindUser(context.Background(), db, id)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			// User not registerd
+			if registerdRole != nil {
+				err := s.GuildMemberRoleRemove(guildID, member.User.ID, strconv.FormatInt(registerdRole.ID, 10))
+				if err != nil {
+					log.Println(err)
+				}
+			}
+			return nil
+		}
+		log.Println(err)
 		return err
+	}
+	if registerdRole != nil {
+		err := s.GuildMemberRoleAdd(guildID, member.User.ID, strconv.FormatInt(registerdRole.ID, 10))
+		if err != nil {
+			log.Println(err)
+		}
 	}
 	rank, err := fetchRank(user.SteamID)
 	if err != nil {
@@ -130,7 +179,6 @@ func watchMember(s *discordgo.Session, g *models.Guild, member *discordgo.Member
 	}
 	medal := rank / 10
 
-	guildID := strconv.FormatInt(g.ID, 10)
 	var errs error
 	for _, r := range roles {
 		id := strconv.FormatInt(r.ID, 10)

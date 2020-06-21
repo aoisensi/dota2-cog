@@ -4,11 +4,13 @@
 package models
 
 var TableNames = struct {
-	Guilds string
-	Roles  string
-	Users  string
+	Guilds         string
+	RankRoles      string
+	RegisterdRoles string
+	Users          string
 }{
-	Guilds: "guilds",
-	Roles:  "roles",
-	Users:  "users",
+	Guilds:         "guilds",
+	RankRoles:      "rank_roles",
+	RegisterdRoles: "registerd_roles",
+	Users:          "users",
 }

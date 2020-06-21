@@ -1,0 +1,1 @@
+DROP TABLE registerd_roles;

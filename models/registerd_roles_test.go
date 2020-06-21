@@ -21,24 +21,24 @@ var (
 	_ = queries.Equal
 )
 
-func testRoles(t *testing.T) {
+func testRegisterdRoles(t *testing.T) {
 	t.Parallel()
 
-	query := Roles()
+	query := RegisterdRoles()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testRolesDelete(t *testing.T) {
+func testRegisterdRolesDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -54,7 +54,7 @@ func testRolesDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Roles().Count(ctx, tx)
+	count, err := RegisterdRoles().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,14 +64,14 @@ func testRolesDelete(t *testing.T) {
 	}
 }
 
-func testRolesQueryDeleteAll(t *testing.T) {
+func testRegisterdRolesQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -81,13 +81,13 @@ func testRolesQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := Roles().DeleteAll(ctx, tx); err != nil {
+	if rowsAff, err := RegisterdRoles().DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Roles().Count(ctx, tx)
+	count, err := RegisterdRoles().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,14 +97,14 @@ func testRolesQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testRolesSliceDeleteAll(t *testing.T) {
+func testRegisterdRolesSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -114,7 +114,7 @@ func testRolesSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := RoleSlice{o}
+	slice := RegisterdRoleSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
@@ -122,7 +122,7 @@ func testRolesSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Roles().Count(ctx, tx)
+	count, err := RegisterdRoles().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,14 +132,14 @@ func testRolesSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testRolesExists(t *testing.T) {
+func testRegisterdRolesExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -149,23 +149,23 @@ func testRolesExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := RoleExists(ctx, tx, o.ID)
+	e, err := RegisterdRoleExists(ctx, tx, o.ID)
 	if err != nil {
-		t.Errorf("Unable to check if Role exists: %s", err)
+		t.Errorf("Unable to check if RegisterdRole exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected RoleExists to return true, but got false.")
+		t.Errorf("Expected RegisterdRoleExists to return true, but got false.")
 	}
 }
 
-func testRolesFind(t *testing.T) {
+func testRegisterdRolesFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -175,24 +175,24 @@ func testRolesFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	roleFound, err := FindRole(ctx, tx, o.ID)
+	registerdRoleFound, err := FindRegisterdRole(ctx, tx, o.ID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if roleFound == nil {
+	if registerdRoleFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testRolesBind(t *testing.T) {
+func testRegisterdRolesBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -202,19 +202,19 @@ func testRolesBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = Roles().Bind(ctx, tx, o); err != nil {
+	if err = RegisterdRoles().Bind(ctx, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testRolesOne(t *testing.T) {
+func testRegisterdRolesOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -224,38 +224,38 @@ func testRolesOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := Roles().One(ctx, tx); err != nil {
+	if x, err := RegisterdRoles().One(ctx, tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testRolesAll(t *testing.T) {
+func testRegisterdRolesAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	roleOne := &Role{}
-	roleTwo := &Role{}
-	if err = randomize.Struct(seed, roleOne, roleDBTypes, false, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	registerdRoleOne := &RegisterdRole{}
+	registerdRoleTwo := &RegisterdRole{}
+	if err = randomize.Struct(seed, registerdRoleOne, registerdRoleDBTypes, false, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
-	if err = randomize.Struct(seed, roleTwo, roleDBTypes, false, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	if err = randomize.Struct(seed, registerdRoleTwo, registerdRoleDBTypes, false, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = roleOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = registerdRoleOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = roleTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = registerdRoleTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := Roles().All(ctx, tx)
+	slice, err := RegisterdRoles().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -265,31 +265,31 @@ func testRolesAll(t *testing.T) {
 	}
 }
 
-func testRolesCount(t *testing.T) {
+func testRegisterdRolesCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	roleOne := &Role{}
-	roleTwo := &Role{}
-	if err = randomize.Struct(seed, roleOne, roleDBTypes, false, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	registerdRoleOne := &RegisterdRole{}
+	registerdRoleTwo := &RegisterdRole{}
+	if err = randomize.Struct(seed, registerdRoleOne, registerdRoleDBTypes, false, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
-	if err = randomize.Struct(seed, roleTwo, roleDBTypes, false, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	if err = randomize.Struct(seed, registerdRoleTwo, registerdRoleDBTypes, false, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = roleOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = registerdRoleOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = roleTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = registerdRoleTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := Roles().Count(ctx, tx)
+	count, err := RegisterdRoles().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -299,155 +299,155 @@ func testRolesCount(t *testing.T) {
 	}
 }
 
-func roleBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *Role) error {
-	*o = Role{}
+func registerdRoleBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *RegisterdRole) error {
+	*o = RegisterdRole{}
 	return nil
 }
 
-func roleAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *Role) error {
-	*o = Role{}
+func registerdRoleAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *RegisterdRole) error {
+	*o = RegisterdRole{}
 	return nil
 }
 
-func roleAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *Role) error {
-	*o = Role{}
+func registerdRoleAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *RegisterdRole) error {
+	*o = RegisterdRole{}
 	return nil
 }
 
-func roleBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *Role) error {
-	*o = Role{}
+func registerdRoleBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *RegisterdRole) error {
+	*o = RegisterdRole{}
 	return nil
 }
 
-func roleAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *Role) error {
-	*o = Role{}
+func registerdRoleAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *RegisterdRole) error {
+	*o = RegisterdRole{}
 	return nil
 }
 
-func roleBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *Role) error {
-	*o = Role{}
+func registerdRoleBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *RegisterdRole) error {
+	*o = RegisterdRole{}
 	return nil
 }
 
-func roleAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *Role) error {
-	*o = Role{}
+func registerdRoleAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *RegisterdRole) error {
+	*o = RegisterdRole{}
 	return nil
 }
 
-func roleBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *Role) error {
-	*o = Role{}
+func registerdRoleBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *RegisterdRole) error {
+	*o = RegisterdRole{}
 	return nil
 }
 
-func roleAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *Role) error {
-	*o = Role{}
+func registerdRoleAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *RegisterdRole) error {
+	*o = RegisterdRole{}
 	return nil
 }
 
-func testRolesHooks(t *testing.T) {
+func testRegisterdRolesHooks(t *testing.T) {
 	t.Parallel()
 
 	var err error
 
 	ctx := context.Background()
-	empty := &Role{}
-	o := &Role{}
+	empty := &RegisterdRole{}
+	o := &RegisterdRole{}
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, o, roleDBTypes, false); err != nil {
-		t.Errorf("Unable to randomize Role object: %s", err)
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, false); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole object: %s", err)
 	}
 
-	AddRoleHook(boil.BeforeInsertHook, roleBeforeInsertHook)
+	AddRegisterdRoleHook(boil.BeforeInsertHook, registerdRoleBeforeInsertHook)
 	if err = o.doBeforeInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeInsertHook function to empty object, but got: %#v", o)
 	}
-	roleBeforeInsertHooks = []RoleHook{}
+	registerdRoleBeforeInsertHooks = []RegisterdRoleHook{}
 
-	AddRoleHook(boil.AfterInsertHook, roleAfterInsertHook)
+	AddRegisterdRoleHook(boil.AfterInsertHook, registerdRoleAfterInsertHook)
 	if err = o.doAfterInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterInsertHook function to empty object, but got: %#v", o)
 	}
-	roleAfterInsertHooks = []RoleHook{}
+	registerdRoleAfterInsertHooks = []RegisterdRoleHook{}
 
-	AddRoleHook(boil.AfterSelectHook, roleAfterSelectHook)
+	AddRegisterdRoleHook(boil.AfterSelectHook, registerdRoleAfterSelectHook)
 	if err = o.doAfterSelectHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterSelectHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterSelectHook function to empty object, but got: %#v", o)
 	}
-	roleAfterSelectHooks = []RoleHook{}
+	registerdRoleAfterSelectHooks = []RegisterdRoleHook{}
 
-	AddRoleHook(boil.BeforeUpdateHook, roleBeforeUpdateHook)
+	AddRegisterdRoleHook(boil.BeforeUpdateHook, registerdRoleBeforeUpdateHook)
 	if err = o.doBeforeUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpdateHook function to empty object, but got: %#v", o)
 	}
-	roleBeforeUpdateHooks = []RoleHook{}
+	registerdRoleBeforeUpdateHooks = []RegisterdRoleHook{}
 
-	AddRoleHook(boil.AfterUpdateHook, roleAfterUpdateHook)
+	AddRegisterdRoleHook(boil.AfterUpdateHook, registerdRoleAfterUpdateHook)
 	if err = o.doAfterUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpdateHook function to empty object, but got: %#v", o)
 	}
-	roleAfterUpdateHooks = []RoleHook{}
+	registerdRoleAfterUpdateHooks = []RegisterdRoleHook{}
 
-	AddRoleHook(boil.BeforeDeleteHook, roleBeforeDeleteHook)
+	AddRegisterdRoleHook(boil.BeforeDeleteHook, registerdRoleBeforeDeleteHook)
 	if err = o.doBeforeDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeDeleteHook function to empty object, but got: %#v", o)
 	}
-	roleBeforeDeleteHooks = []RoleHook{}
+	registerdRoleBeforeDeleteHooks = []RegisterdRoleHook{}
 
-	AddRoleHook(boil.AfterDeleteHook, roleAfterDeleteHook)
+	AddRegisterdRoleHook(boil.AfterDeleteHook, registerdRoleAfterDeleteHook)
 	if err = o.doAfterDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterDeleteHook function to empty object, but got: %#v", o)
 	}
-	roleAfterDeleteHooks = []RoleHook{}
+	registerdRoleAfterDeleteHooks = []RegisterdRoleHook{}
 
-	AddRoleHook(boil.BeforeUpsertHook, roleBeforeUpsertHook)
+	AddRegisterdRoleHook(boil.BeforeUpsertHook, registerdRoleBeforeUpsertHook)
 	if err = o.doBeforeUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpsertHook function to empty object, but got: %#v", o)
 	}
-	roleBeforeUpsertHooks = []RoleHook{}
+	registerdRoleBeforeUpsertHooks = []RegisterdRoleHook{}
 
-	AddRoleHook(boil.AfterUpsertHook, roleAfterUpsertHook)
+	AddRegisterdRoleHook(boil.AfterUpsertHook, registerdRoleAfterUpsertHook)
 	if err = o.doAfterUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpsertHook function to empty object, but got: %#v", o)
 	}
-	roleAfterUpsertHooks = []RoleHook{}
+	registerdRoleAfterUpsertHooks = []RegisterdRoleHook{}
 }
 
-func testRolesInsert(t *testing.T) {
+func testRegisterdRolesInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -457,7 +457,7 @@ func testRolesInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Roles().Count(ctx, tx)
+	count, err := RegisterdRoles().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -467,24 +467,24 @@ func testRolesInsert(t *testing.T) {
 	}
 }
 
-func testRolesInsertWhitelist(t *testing.T) {
+func testRegisterdRolesInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(ctx, tx, boil.Whitelist(roleColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(ctx, tx, boil.Whitelist(registerdRoleColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := Roles().Count(ctx, tx)
+	count, err := RegisterdRoles().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -494,17 +494,17 @@ func testRolesInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testRoleToOneGuildUsingGuild(t *testing.T) {
+func testRegisterdRoleToOneGuildUsingGuild(t *testing.T) {
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var local Role
+	var local RegisterdRole
 	var foreign Guild
 
 	seed := randomize.NewSeed()
-	if err := randomize.Struct(seed, &local, roleDBTypes, false, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	if err := randomize.Struct(seed, &local, registerdRoleDBTypes, false, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 	if err := randomize.Struct(seed, &foreign, guildDBTypes, false, guildColumnsWithDefault...); err != nil {
 		t.Errorf("Unable to randomize Guild struct: %s", err)
@@ -528,8 +528,8 @@ func testRoleToOneGuildUsingGuild(t *testing.T) {
 		t.Errorf("want: %v, got %v", foreign.ID, check.ID)
 	}
 
-	slice := RoleSlice{&local}
-	if err = local.L.LoadGuild(ctx, tx, false, (*[]*Role)(&slice), nil); err != nil {
+	slice := RegisterdRoleSlice{&local}
+	if err = local.L.LoadGuild(ctx, tx, false, (*[]*RegisterdRole)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
 	if local.R.Guild == nil {
@@ -545,18 +545,18 @@ func testRoleToOneGuildUsingGuild(t *testing.T) {
 	}
 }
 
-func testRoleToOneSetOpGuildUsingGuild(t *testing.T) {
+func testRegisterdRoleToOneSetOpGuildUsingGuild(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a Role
+	var a RegisterdRole
 	var b, c Guild
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, roleDBTypes, false, strmangle.SetComplement(rolePrimaryKeyColumns, roleColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, registerdRoleDBTypes, false, strmangle.SetComplement(registerdRolePrimaryKeyColumns, registerdRoleColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
 	if err = randomize.Struct(seed, &b, guildDBTypes, false, strmangle.SetComplement(guildPrimaryKeyColumns, guildColumnsWithoutDefault)...); err != nil {
@@ -583,7 +583,7 @@ func testRoleToOneSetOpGuildUsingGuild(t *testing.T) {
 			t.Error("relationship struct not set to correct value")
 		}
 
-		if x.R.Roles[0] != &a {
+		if x.R.RegisterdRole != &a {
 			t.Error("failed to append to foreign relationship struct")
 		}
 		if a.GuildID != x.ID {
@@ -603,14 +603,14 @@ func testRoleToOneSetOpGuildUsingGuild(t *testing.T) {
 	}
 }
 
-func testRolesReload(t *testing.T) {
+func testRegisterdRolesReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -625,14 +625,14 @@ func testRolesReload(t *testing.T) {
 	}
 }
 
-func testRolesReloadAll(t *testing.T) {
+func testRegisterdRolesReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -642,21 +642,21 @@ func testRolesReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := RoleSlice{o}
+	slice := RegisterdRoleSlice{o}
 
 	if err = slice.ReloadAll(ctx, tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testRolesSelect(t *testing.T) {
+func testRegisterdRolesSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -666,7 +666,7 @@ func testRolesSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := Roles().All(ctx, tx)
+	slice, err := RegisterdRoles().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -677,25 +677,25 @@ func testRolesSelect(t *testing.T) {
 }
 
 var (
-	roleDBTypes = map[string]string{`ID`: `bigint`, `GuildID`: `bigint`, `Rank`: `integer`}
-	_           = bytes.MinRead
+	registerdRoleDBTypes = map[string]string{`ID`: `bigint`, `GuildID`: `bigint`}
+	_                    = bytes.MinRead
 )
 
-func testRolesUpdate(t *testing.T) {
+func testRegisterdRolesUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(rolePrimaryKeyColumns) {
+	if 0 == len(registerdRolePrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(roleAllColumns) == len(rolePrimaryKeyColumns) {
+	if len(registerdRoleAllColumns) == len(registerdRolePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -705,7 +705,7 @@ func testRolesUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Roles().Count(ctx, tx)
+	count, err := RegisterdRoles().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -714,8 +714,8 @@ func testRolesUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, roleDBTypes, true, rolePrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRolePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(ctx, tx, boil.Infer()); err != nil {
@@ -725,18 +725,18 @@ func testRolesUpdate(t *testing.T) {
 	}
 }
 
-func testRolesSliceUpdateAll(t *testing.T) {
+func testRegisterdRolesSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(roleAllColumns) == len(rolePrimaryKeyColumns) {
+	if len(registerdRoleAllColumns) == len(registerdRolePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Role{}
-	if err = randomize.Struct(seed, o, roleDBTypes, true, roleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := &RegisterdRole{}
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRoleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -746,7 +746,7 @@ func testRolesSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Roles().Count(ctx, tx)
+	count, err := RegisterdRoles().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -755,18 +755,18 @@ func testRolesSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, roleDBTypes, true, rolePrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	if err = randomize.Struct(seed, o, registerdRoleDBTypes, true, registerdRolePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(roleAllColumns, rolePrimaryKeyColumns) {
-		fields = roleAllColumns
+	if strmangle.StringSliceMatch(registerdRoleAllColumns, registerdRolePrimaryKeyColumns) {
+		fields = registerdRoleAllColumns
 	} else {
 		fields = strmangle.SetComplement(
-			roleAllColumns,
-			rolePrimaryKeyColumns,
+			registerdRoleAllColumns,
+			registerdRolePrimaryKeyColumns,
 		)
 	}
 
@@ -784,7 +784,7 @@ func testRolesSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := RoleSlice{o}
+	slice := RegisterdRoleSlice{o}
 	if rowsAff, err := slice.UpdateAll(ctx, tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -792,29 +792,29 @@ func testRolesSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testRolesUpsert(t *testing.T) {
+func testRegisterdRolesUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(roleAllColumns) == len(rolePrimaryKeyColumns) {
+	if len(registerdRoleAllColumns) == len(registerdRolePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := Role{}
-	if err = randomize.Struct(seed, &o, roleDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	o := RegisterdRole{}
+	if err = randomize.Struct(seed, &o, registerdRoleDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(ctx, tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert Role: %s", err)
+		t.Errorf("Unable to upsert RegisterdRole: %s", err)
 	}
 
-	count, err := Roles().Count(ctx, tx)
+	count, err := RegisterdRoles().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -823,15 +823,15 @@ func testRolesUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, roleDBTypes, false, rolePrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize Role struct: %s", err)
+	if err = randomize.Struct(seed, &o, registerdRoleDBTypes, false, registerdRolePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize RegisterdRole struct: %s", err)
 	}
 
 	if err = o.Upsert(ctx, tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert Role: %s", err)
+		t.Errorf("Unable to upsert RegisterdRole: %s", err)
 	}
 
-	count, err = Roles().Count(ctx, tx)
+	count, err = RegisterdRoles().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
