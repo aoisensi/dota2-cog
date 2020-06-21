@@ -25,7 +25,7 @@ var Root http.FileSystem = fileSystem{
 	},
 	file{
 		name:    "/index.html",
-		content: "<!DOCTYPE html>\n<html lang=\"ja\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Dota2 Cog</title>\n</head>\n<body>\n  <div id=\"content\"></div>\n  <script src=\"https://cdn.jsdelivr.net/npm/marked/marked.min.js\"></script>\n  <script>\n    fetch(\"/index.md\", {method: \"GET\"})\n      .then(response => response.text())\n      .then(markdown => {\n        console.log(markdown);\n        document.getElementById(\"content\").innerHTML = marked(markdown)\n      });\n  </script>\n</body>\n</html>",
+		content: "<!DOCTYPE html>\n<html lang=\"ja\">\n<head>\n  <!-- Global site tag (gtag.js) - Google Analytics -->\n  <script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-61982517-7\"></script>\n  <script>\n    window.dataLayer = window.dataLayer || [];\n    function gtag(){dataLayer.push(arguments);}\n    gtag('js', new Date());\n    gtag('config', 'UA-61982517-7');\n  </script>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Dota2 Cog Bot</title>\n</head>\n<body>\n  <div id=\"content\"></div>\n  <script src=\"https://cdn.jsdelivr.net/npm/marked/marked.min.js\"></script>\n  <script>\n    fetch(\"/index.md\", {method: \"GET\"})\n      .then(response => response.text())\n      .then(markdown => {\n        console.log(markdown);\n        document.getElementById(\"content\").innerHTML = marked(markdown)\n      });\n  </script>\n</body>\n</html>",
 		mode:    0644,
 		next:    2,
 		child:   -1,
