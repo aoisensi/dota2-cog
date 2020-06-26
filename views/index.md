@@ -103,6 +103,12 @@ Dota2 Cog Bot は無料で使えますが、もしあなたがこのbotの維持
 
 * * *
 
+### サポーター
+
+- [enocinoco](https://steamcommunity.com/id/enocinoco/)
+
+ありがとうございます!!
+
 ### その他
 
 本当はDiscordのプロフィールからSteamIDを取得したかったがAPIがサポートしてないのでログインさせるという形になった…
