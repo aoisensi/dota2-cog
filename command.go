@@ -32,7 +32,7 @@ func onMessageCreate(s *discordgo.Session, e *discordgo.MessageCreate) {
 }
 
 func commandRegister(s *discordgo.Session, e *discordgo.MessageCreate) {
-	if e.GuildID == "" {
+	if e.GuildID != "" {
 		s.ChannelMessageSend(e.ChannelID, "This command is only available in Direct Message.")
 		return
 	}
