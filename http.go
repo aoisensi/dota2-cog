@@ -3,11 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 
-	"github.com/aoisensi/dota2-cog/assets"
 	"github.com/aoisensi/dota2-cog/models"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -24,7 +22,6 @@ func httpServer() {
 	store := cookie.NewStore([]byte(env.SessionKey))
 	r.Use(sessions.Sessions("session", store))
 	r.GET("/", handleIndex)
-	r.GET("/index.md", handleIndexMD)
 	r.GET("/add-bot", handleAddBot)
 	r.GET("/connect", handleConnect)
 	r.GET("/connect-ok", handleConnectOK)
@@ -32,23 +29,7 @@ func httpServer() {
 }
 
 func handleIndex(c *gin.Context) {
-	f, err := assets.Root.Open("index.html")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-	data, _ := ioutil.ReadAll(f)
-	c.Writer.Write(data)
-}
-
-func handleIndexMD(c *gin.Context) {
-	f, err := assets.Root.Open("index.md")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-	data, _ := ioutil.ReadAll(f)
-	c.Writer.Write(data)
+	c.Writer.Write(assetsIndex)
 }
 
 func handleAddBot(c *gin.Context) {
@@ -110,5 +91,5 @@ func handleConnectOK(c *gin.Context) {
 		return
 	}
 	deleteNonce(discordID)
-	c.String(http.StatusOK, "The link has been successfully completed!!\nYou may close this window.")
+	c.String(http.StatusOK, "The link has been successfully completed!!\nYou may close this window.\nアカウントのリンクが完了しました!!\nこのウィンドウは閉じて構いません。")
 }

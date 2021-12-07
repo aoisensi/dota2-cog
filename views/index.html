@@ -1,28 +1,154 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-61982517-7"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'UA-61982517-7');
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dota2 Cog Bot</title>
+  <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
 </head>
+
 <body>
-  <div id="content"></div>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script>
-    fetch("/index.md", {method: "GET"})
-      .then(response => response.text())
-      .then(markdown => {
-        console.log(markdown);
-        document.getElementById("content").innerHTML = marked(markdown)
-      });
-  </script>
+  <h1>Dota2 Cog</h1>
+  <p>Discordの役職に自動でDota2のランク(メダル)を割り当てるbotです</p>
+  <p>1時間に1回、自動でOpenDotaから情報を取ってきて役職を割り当てます</p>
+  <hr>
+  <h3>使い方</h3>
+  <h4>サーバーアドミン</h4>
+  <p><a href="/add-bot">ここ</a>からサーバーにbotを追加してください</p>
+  <p>追加されたロールは色や名前の変更など自由に編集可能です(多分…)</p>
+  <h4>サーバーメンバー</h4>
+  <p>Dota2 Cog BotにDMで <code>/dota2-cog register</code> コマンドを送って</p>
+  <p>表示されたリンクをクリックし、Steamとの連携を有効にしてください</p>
+  <hr>
+  <h3>コマンドリスト</h3>
+  <h5>/dota2-cog register</h5>
+  <p>SteamとDiscordのIDを連携させます (DMのみ)</p>
+  <p>一度実行すれば、他のサーバーでこのbotを導入したとしても再使用は不要です</p>
+  <h5>/dota2-cog force-fetch</h5>
+  <p>現在のサーバーの全ユーザーのランクを取得します (乱用禁止!) (サーバーコマンドのみ) (管理者のみ)</p>
+  <h5>/dota2-cog fix-rank-roles</h5>
+  <p>ランクロールの修正をします 間違えてロールを削除してしまったときなどに使ってください (サーバーコマンドのみ) (管理者のみ)</p>
+  <h5>/dota2-cog fix-registerd-role</h5>
+  <p>登録済みロールの修正をします 間違えてロールを削除してしまったときなどに使ってください (サーバーコマンドのみ) (管理者のみ)</p>
+  <hr>
+  <h3>バージョン履歴</h3>
+  <ul>
+    <li>
+      <h4>0.3.0 2021-12-07</h4>
+      <p>諸々修正 (1年半ぶりのアップデート!!)</p>
+      </li>
+    <li>
+      <h4>0.2.1 2020-06-21</h4>
+      <p>サーバーオーナー(冠が付いてるやつ)でも管理者コマンドが使えるようになった</p>
+      <p><code>register</code>をやっぱりDMのみにした(セキュリティ上の問題で)</p>
+      <p>このページをMarkdownで書くようにした</p>
+    </li>
+    <li>
+      <h4>0.2.0 2020-06-21</h4>
+      <p>登録済みユーザーを割り当てる <code>Dota2 Cog Registerd</code> ロールを作った</p>
+      <p><code>/dota2-cog fix-roles</code> コマンドを <code>/dota2-cog fix-rank-roles</code> に変更</p>
+    </li>
+    <li>
+      <h4>0.1.4 2020-06-15</h4>
+      <p>force-fetchしたときにプログレスバーを表示するようにした</p>
+      <p>fetch中にforce-fetchした場合エラーを返すようにした</p>
+      <p>fix-roles コマンドを追加した</p>
+    </li>
+    <li>
+      <h4>0.1.3 2020-06-14</h4>
+      <p>ロールの再割り当てのアルゴリズムの最適化</p>
+    </li>
+    <li>
+      <h4>0.1.2 2020-06-13</h4>
+      <p>ちょっとだけ修正</p>
+    </li>
+    <li>
+      <h4>0.1.1 2020-06-12</h4>
+      <p>BotアカウントのFetchをスキップするようにした</p>
+    </li>
+    <li>
+      <h4>0.1.0 2020-06-10</h4>
+      <p>初期バージョン</p>
+    </li>
+  </ul>
+  <hr>
+  <h3 id="寄付のお願い">寄付のお願い</h3>
+  <p>Dota2 Cog Bot は無料で使えますが、もしあなたがこのbotの維持に協力してくれるなら寄付をお願いします</p>
+  <p>このサービスの運営には毎月のサーバー代などが掛かっています</p>
+  <h4 id="月額支援">月額支援</h4>
+  <p><a href="https://liberapay.com/aoisensi/donate"><img src="https://liberapay.com/assets/widgets/donate.svg"
+        alt="Donate using Liberapay"></a></p>
+  <h4>1回限りの寄付</h4>
+  <style>
+    .bmc-button img {
+      height: 34px !important;
+      width: 35px !important;
+      margin-bottom: 1px !important;
+      box-shadow: none !important;
+      border: none !important;
+      vertical-align: middle !important;
+    }
+
+    .bmc-button {
+      padding: 7px 15px 7px 10px !important;
+      line-height: 35px !important;
+      height: 51px !important;
+      text-decoration: none !important;
+      display: inline-flex !important;
+      color: #ffffff !important;
+      background-color: #5F7FFF !important;
+      border-radius: 5px !important;
+      border: 1px solid transparent !important;
+      padding: 7px 15px 7px 10px !important;
+      font-size: 28px !important;
+      letter-spacing: 0.6px !important;
+      box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+      -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+      margin: 0 auto !important;
+      font-family: 'Cookie', cursive !important;
+      -webkit-box-sizing: border-box !important;
+      box-sizing: border-box !important;
+    }
+
+    .bmc-button:hover,
+    .bmc-button:active,
+    .bmc-button:focus {
+      -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+      text-decoration: none !important;
+      box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+      opacity: 0.85 !important;
+      color: #ffffff !important;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet"><a class="bmc-button" target="_blank"
+    href="https://www.buymeacoffee.com/aoisensi"><img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg"
+      alt="Buy me a soda"><span style="margin-left:5px;font-size:28px !important;">Buy me a soda</span></a>
+
+  <hr>
+  <h3 id="サポーター">サポーター</h3>
+  <ul>
+    <li><a href="https://steamcommunity.com/id/enocinoco/">enocinoco</a></li>
+  </ul>
+  <p>ありがとうございます!!</p>
+  <h3">その他</h3>
+    <p>本当はDiscordのプロフィールからSteamIDを取得したかったがAPIがサポートしてないのでログインさせるという形になった…</p>
+    <p>1000人以上いるサーバーでは最初の1000人しかデータを取れない 後々何とかする</p>
+    <p>サーバーにいる人全員に連携を促すDMを送るコマンド作りたいがスパム扱いされそう…</p>
+    <p>ソースコード:<a href="https://github.com/aoisensi/dota2-cog">https://github.com/aoisensi/dota2-cog</a></p>
+    <p>なにか問題点などあれば<strong>aoisensi#0634</strong>または<a
+        href="https://steamcommunity.com/id/aoisensi">https://steamcommunity.com/id/aoisensi</a>までどうぞ</p>
+    <p>I will write this page with English.</p>
+
 </body>
+
 </html>
